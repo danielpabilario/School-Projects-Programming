@@ -1,0 +1,179 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Base Class (Polymorphism)
+class Subject
+{
+protected:
+    string name;
+    double prelim;
+    double midterm;
+
+public:
+    Subject(string n, double p, double m)
+    {
+        name = n;
+        prelim = p;
+        midterm = m;
+    }
+
+    // Virtual Function (Runtime Polymorphism)
+    virtual void compute(double target) = 0;
+
+    // Function Overloading
+    void compute()
+    {
+        compute(5);
+    }
+
+    virtual void display()
+    {
+        cout << "\nSubject: " << name << endl;
+        cout << "Prelim: " << prelim << endl;
+        cout << "Midterm: " << midterm << endl;
+    }
+
+    double getPrelim() { return prelim; }
+    double getMidterm() { return midterm; }
+
+    virtual ~Subject()
+    {
+        cout << "Closing record: " << name << endl;
+    }
+};
+
+// Core Subjects (with computation)
+class CoreSubject : public Subject
+{
+public:
+    CoreSubject(string n, double p, double m)
+        : Subject(n, p, m) {}
+
+    // Function Overriding
+    void compute(double target)
+    {
+        double endterm =
+            (target - (prelim * 0.3 + midterm * 0.3)) / 0.4;
+
+        cout << "\n[" << name << "] Target Grade: " << target << endl;
+        cout << "Required Endterm: " << endterm << endl;
+
+        if (endterm > 10)
+            cout << "Not achievable.\n";
+        else if (endterm < 1)
+            cout << "Already safe.\n";
+        else
+            cout << "Need at least " << endterm << endl;
+    }
+};
+
+// Minor Subjects (no computation)
+class MinorSubject : public Subject
+{
+public:
+    MinorSubject(string n, double p, double m)
+        : Subject(n, p, m) {}
+
+    void compute(double target)
+    {
+        cout << "\n[" << name << "] No computation required.\n";
+    }
+};
+
+// Operator Overloading (Grades + Benchmark)
+class Grades
+{
+public:
+    double prelimAvg;
+    double midtermAvg;
+
+    Grades(double p, double m)
+    {
+        prelimAvg = p;
+        midtermAvg = m;
+    }
+
+    // Operator Overloading
+    Grades operator+(Grades benchmark)
+    {
+        Grades result(0, 0);
+
+        // compare student performance vs benchmark
+        result.prelimAvg = (prelimAvg + benchmark.prelimAvg) / 2;
+        result.midtermAvg = (midtermAvg + benchmark.midtermAvg) / 2;
+
+        return result;
+    }
+
+    void showPerformance()
+    {
+        double performance = (prelimAvg + midtermAvg) / 2;
+
+        cout << "\n--- Academic Performance Evaluation ---" << endl;
+        cout << "Prelim Average: " << prelimAvg << endl;
+        cout << "Midterm Average: " << midtermAvg << endl;
+        cout << "Overall Performance: " << performance << endl;
+
+        if (performance >= 7)
+            cout << "Status: Above Academic Benchmark (Eligible for Honors)\n";
+        else
+            cout << "Status: Below Benchmark (Needs Improvement)\n";
+    }
+};
+
+int main()
+{
+    cout << "\n========================\n";
+
+    // Runtime Polymorphism (Core Subjects)
+    CoreSubject c1("IntegCalc", 4.8, 7.6);
+    CoreSubject c2("Physics", 6.3, 5.0);
+    CoreSubject c3("Elecs", 6.8, 6.4);
+
+    Subject* p1 = &c1;
+    Subject* p2 = &c2;
+    Subject* p3 = &c3;
+
+    p1->display();
+    p1->compute(6);
+
+    p2->display();
+    p2->compute(6);
+
+    p3->display();
+    p3->compute(6);
+
+    cout << "\n========================\n";
+
+    // Minor Subjects
+    MinorSubject m1("GenSoc", 6.5, 6.0);
+    MinorSubject m2("RPH", 7.0, 6.5);
+
+    Subject* pm1 = &m1;
+    Subject* pm2 = &m2;
+
+    pm1->display();
+    pm1->compute(0);
+
+    pm2->display();
+    pm2->compute(0);
+
+    cout << "\n========================\n";
+
+    // Operator Overloading (Grades vs Benchmark)
+
+    Grades studentGrades(
+        (6.4 + 5.2 + 6.0) / 3,
+        (4.8 + 5.5 + 5.0) / 3
+    );
+
+    Grades benchmark(7.0, 7.0);
+
+    Grades result = studentGrades + benchmark;
+
+    result.showPerformance();
+
+    return 0;
+}
+
