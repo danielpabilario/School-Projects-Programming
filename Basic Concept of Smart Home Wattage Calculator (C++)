@@ -1,0 +1,159 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class SmartHome
+{
+protected:
+    string device;
+    string status;
+    int Watts1;
+    int Watts2;
+    int Watts3;
+
+public:
+    SmartHome(string a, int b)
+    {
+        device = a;
+
+        if (b == 1)
+            status = "On";
+        else if (b == 0)
+            status = "Off";
+        else 
+            cout << "Cannot be";
+    }
+
+    virtual void Wattage(int wattage) = 0;
+
+    virtual void display()
+    {
+        cout << "Smart Device: " << device << endl;
+        cout << "Status: " << status << endl;
+    }
+    virtual ~SmartHome()
+    {   
+        cout << endl;
+        cout << device << " disconnected.";
+    }
+    
+    virtual int watts() = 0;
+};
+
+class Light : public SmartHome
+{
+public:
+    Light(string a, int b) : SmartHome(a, b) {}
+
+    void Wattage(int wattage) override
+    {
+        if (status == "Off") {
+            cout << "Power Consumption: 0 W" << endl;
+            Watts1 = 0; }
+        else {
+            cout << "Power Consumption: "
+                 << wattage * 1 << " W" << endl;
+                Watts1 = wattage * 1; }
+    }
+    void display() override
+    {
+        cout << "\n[Light]" << endl;
+        SmartHome::display();
+    }
+    int watts() override {
+        return Watts1;
+    }
+};
+
+class TV : public SmartHome
+{
+public:
+    TV(string a, int b) : SmartHome(a, b) {}
+
+    void Wattage(int wattage) override
+    {
+        if (status == "Off") {
+            cout << "Power Consumption: 0 W" << endl;
+            Watts2 = 0; }
+        else {
+            cout << "Power Consumption: "
+                 << wattage * 30 << " W" << endl;
+                Watts2 = wattage * 30; }
+    }
+    void display() override
+    {
+        cout << "\n[TV]" << endl;
+        SmartHome::display();
+    }
+    int watts() override {
+        return Watts2;
+    }
+};
+
+class AC : public SmartHome
+{
+public:
+    AC(string a, int b)
+        : SmartHome(a, b) {
+        }
+
+    void Wattage(int wattage) override
+    {
+        if (status == "Off") {
+            cout << "Power Consumption: 0 W" << endl; 
+            Watts3 = 0;}
+        else {
+            cout << "Power Consumption: " << wattage * 150 << " W" << endl;
+                 Watts3 = wattage * 150; } 
+    }
+    void display() override
+    {
+        cout << "\n[AC]" << endl;
+        SmartHome::display();
+    }
+    int watts() override {
+        return Watts3;
+    }
+};
+
+class TotalWattage {
+    public: 
+    int value;
+    
+    TotalWattage(int a) {
+        value = a;
+    }
+    TotalWattage operator+(TotalWattage other) {
+        TotalWattage result(0);
+        result.value = value + other.value;
+        return result;
+    }
+};
+
+
+int main()  {
+    cout << "===== SMART HOME SYSTEM =====" << endl;
+
+    Light l1("Living Room Light", 1);
+    AC a1("Bedroom AC", 1);
+    TV t1("Living Room TV", 0);
+
+    SmartHome* d1 = &l1;
+    SmartHome* d2 = &a1;
+    SmartHome* d3 = &t1;
+    d1->display();
+    d1->Wattage(20);
+    d2->display();
+    d2->Wattage(20);
+    d3->display();
+    d3->Wattage(20);
+
+
+    TotalWattage W(l1.watts());
+    TotalWattage W2(a1.watts());
+    TotalWattage W3(t1.watts());
+    TotalWattage result = W + W2 + W3;
+    cout << "\nTotal Wattage: " << result.value << endl;
+
+    return 0;
+}
